@@ -40,6 +40,11 @@ typedef NS_ENUM(NSUInteger, XXTextFieldEvent){
 /**
  *  最大字节数
  */
+@property(nonatomic,assign) NSInteger maxBytesLength;
+
+/**
+ *  最大字节数
+ */
 @property(nonatomic,assign) NSInteger maxBytes;
 
 /**

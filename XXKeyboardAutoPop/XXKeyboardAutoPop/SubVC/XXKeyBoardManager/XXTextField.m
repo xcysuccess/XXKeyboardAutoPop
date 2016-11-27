@@ -29,9 +29,39 @@
     assert(0);
 }
 
+//得到字节数函数,处理中英文的补起问题,找到最合适的,防止乱码
+-(NSString*) subStrWithUtf8Len:(int)maxLen
+{
+    int strlen = 0;
+    NSUInteger len = [self length];
+    int i= 0;
+    for(i= 0; i< maxLen ; i++){
+        if(i< len){
+            unichar wchar = [self characterAtIndex:i];
+            if(wchar <= 127){
+                strlen++;
+            }
+            else{
+                strlen += 3;
+            }
+            if(strlen > maxLen){
+                break;
+            }
+        }
+        else{
+            break;
+        }
+    }
+    if(i <= 0){
+        return self;
+    }
+    NSString * str = [self substringWithRange:NSMakeRange(0,i)];
+    return str;
+}
 @end
 
 @interface XXTextField()<UITextFieldDelegate>
+@property(nonatomic,strong) NSString *lastContentText;
 @end
 
 @implementation XXTextField
@@ -69,25 +99,35 @@
 
 -(void) initData{
     _maxLength = INT_MAX;
+    _maxBytesLength = INT_MAX;
 }
 
 #pragma mark- UITextField
 - (void)textFieldDidChange:(UITextField *)textField
 {
     NSString *toBeString = textField.text;
+    NSLog(@"toBeString:%@",toBeString);
+    
     UITextRange *selectedRange = [textField markedTextRange];
     UITextPosition *position = [textField positionFromPosition:selectedRange.start offset:0];
     
     // 没有高亮选择的字，则对已输入的文字进行字数统计和限制,防止中文被截断
     if (!position){
+        //---字符处理
         if (toBeString.length > _maxLength){
             //中文和emoj表情存在问题，需要对此进行处理
             NSRange rangeRange = [toBeString rangeOfComposedCharacterSequencesForRange:NSMakeRange(0, _maxLength)];
             textField.text = [toBeString substringWithRange:rangeRange];
         }
+        
+        //---字节处理
+        NSInteger bytesCount = strlen([textField.text UTF8String]);
+        if (bytesCount > _maxBytesLength) {
+            NSString *content = [textField.text subStrWithUtf8Len:(int)_maxBytesLength];
+            textField.text = content;
+        }
     }
 }
-
 /**
  *  验证字符串是否符合
  *
@@ -130,6 +170,7 @@
             break;
     }
 }
+
 #pragma mark- UITextField Delegate
 // return NO to disallow editing.
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
@@ -159,6 +200,18 @@
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
     
     NSString * inputString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    
+    //限制字节数
+    if ([inputString length] > 0){
+        NSInteger len = strlen([inputString UTF8String]);
+        if (len > _maxBytesLength){
+            return NO;
+        }
+        else {
+            return  YES;
+        }
+    }
+    
     if(inputString.length > 0){
         BOOL ret = [self validateInputString:inputString textField:textField];
         if (ret && _inputCharacter) {
