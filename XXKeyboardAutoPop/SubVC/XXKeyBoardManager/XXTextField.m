@@ -74,26 +74,34 @@
 #pragma mark- UITextField
 - (void)textFieldDidChange:(UITextField *)textField
 {
-    NSString *toBeString = textField.text;
-//    NSLog(@"toBeString:%@",toBeString);
+    NSString *text = textField.text;
+//    NSLog(@"text:%@",text);
     
     UITextRange *selectedRange = [textField markedTextRange];
     UITextPosition *position = [textField positionFromPosition:selectedRange.start offset:0];
     
     // 没有高亮选择的字，则对已输入的文字进行字数统计和限制,防止中文被截断
+    
     if (!position){
         //---字符处理
-        if (toBeString.length > _maxLength){
+        if (text.length > _maxLength){
             //中文和emoj表情存在问题，需要对此进行处理
-            NSRange rangeRange = [toBeString rangeOfComposedCharacterSequencesForRange:NSMakeRange(0, _maxLength)];
-            textField.text = [toBeString substringWithRange:rangeRange];
+            NSRange range;
+            NSUInteger inputLength = 0;
+            for(int i=0; i < text.length && inputLength <= _maxLength; i += range.length) {
+                range = [textField.text rangeOfComposedCharacterSequenceAtIndex:i];
+                inputLength += [text substringWithRange:range].length;
+                if (inputLength > _maxLength) {
+                    NSString* newText = [text substringWithRange:NSMakeRange(0, range.location)];
+                    textField.text = newText;
+                }
+            }
         }
         
         //---字节处理
         //Limit
         NSUInteger textBytesLength = [textField.text lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
         if (textBytesLength > _maxBytesLength) {
-            NSString* text = textField.text;
             NSRange range;
             NSUInteger byteLength = 0;
             for(int i=0; i < text.length && byteLength <= _maxBytesLength; i += range.length) {
@@ -106,8 +114,9 @@
             }
         }
     }
-    
-    self.textFieldChange(self,textField.text);
+    if (self.textFieldChange) {
+        self.textFieldChange(self,textField.text);
+    }
 }
 /**
  *  验证字符串是否符合

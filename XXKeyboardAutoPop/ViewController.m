@@ -29,8 +29,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     _textfieldName.keyboardType = UIKeyboardTypeDefault;
+    
+    
     _textfieldName.inputType = XXTextFieldTypeAny;
-    _textfieldName.maxBytesLength = 10;
+    _textfieldName.maxLength = 5;
+//    _textfieldName.maxBytesLength = 10;
     
     
 //    _textfieldPwd.inputType = XXTextFieldTypeAny;
