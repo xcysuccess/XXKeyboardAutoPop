@@ -182,17 +182,6 @@
     
     NSString * inputString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     
-    //限制字节数
-    if ([inputString length] > 0){
-        NSInteger len = strlen([inputString UTF8String]);
-        if (len > _maxBytesLength){
-            return NO;
-        }
-        else {
-            return  YES;
-        }
-    }
-    
     if(inputString.length > 0){
         BOOL ret = [self validateInputString:inputString textField:textField];
         if (ret && _inputCharacter) {
