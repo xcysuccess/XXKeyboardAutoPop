@@ -42,6 +42,11 @@ typedef NS_ENUM(NSUInteger, XXTextFieldEvent){
  */
 @property(nonatomic,assign) NSInteger maxBytesLength;
 
+
+/**
+ *  中文联想，字符改变的整个字符串回调
+ */
+@property (nonatomic,copy) void (^textFieldChange)(XXTextField *textField, NSString *string);
 /**
  *  成功输入一个字符的回调
  */

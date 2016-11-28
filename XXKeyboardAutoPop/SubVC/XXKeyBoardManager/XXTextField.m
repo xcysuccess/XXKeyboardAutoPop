@@ -75,7 +75,7 @@
 - (void)textFieldDidChange:(UITextField *)textField
 {
     NSString *toBeString = textField.text;
-    NSLog(@"toBeString:%@",toBeString);
+//    NSLog(@"toBeString:%@",toBeString);
     
     UITextRange *selectedRange = [textField markedTextRange];
     UITextPosition *position = [textField positionFromPosition:selectedRange.start offset:0];
@@ -104,9 +104,10 @@
                     textField.text = newText;
                 }
             }
-            
         }
     }
+    
+    self.textFieldChange(self,textField.text);
 }
 /**
  *  验证字符串是否符合
