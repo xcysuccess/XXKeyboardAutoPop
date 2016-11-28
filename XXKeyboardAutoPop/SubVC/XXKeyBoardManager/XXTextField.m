@@ -31,7 +31,6 @@
 @end
 
 @interface XXTextField()<UITextFieldDelegate>
-@property(nonatomic,copy) NSString *lastContentText;
 @end
 
 @implementation XXTextField
@@ -91,9 +90,21 @@
         }
         
         //---字节处理
-        NSInteger bytesCount = strlen([textField.text UTF8String]);
-        if (bytesCount > _maxBytesLength) {
-            textField.text = _lastContentText;
+        //Limit
+        NSUInteger textBytesLength = [textField.text lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+        if (textBytesLength > _maxBytesLength) {
+            NSString* text = textField.text;
+            NSRange range;
+            NSUInteger byteLength = 0;
+            for(int i=0; i < text.length && byteLength <= _maxBytesLength; i += range.length) {
+                range = [textField.text rangeOfComposedCharacterSequenceAtIndex:i];
+                byteLength += strlen([[text substringWithRange:range] UTF8String]);
+                if (byteLength > _maxBytesLength) {
+                    NSString* newText = [text substringWithRange:NSMakeRange(0, range.location)];
+                    textField.text = newText;
+                }
+            }
+            
         }
     }
 }
@@ -177,7 +188,6 @@
             return NO;
         }
         else {
-            _lastContentText = inputString;
             return  YES;
         }
     }
