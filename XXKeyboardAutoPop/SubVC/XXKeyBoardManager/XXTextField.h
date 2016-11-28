@@ -43,11 +43,6 @@ typedef NS_ENUM(NSUInteger, XXTextFieldEvent){
 @property(nonatomic,assign) NSInteger maxBytesLength;
 
 /**
- *  最大字节数
- */
-@property(nonatomic,assign) NSInteger maxBytes;
-
-/**
  *  成功输入一个字符的回调
  */
 @property (nonatomic,copy) void (^inputCharacter)(XXTextField *textField, NSString *string);
