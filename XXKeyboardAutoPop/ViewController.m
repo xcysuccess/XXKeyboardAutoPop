@@ -29,11 +29,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     _textfieldName.keyboardType = UIKeyboardTypeDefault;
-    _textfieldName.inputType = XXTextFieldTypeOnlyInt;
-    _textfieldName.maxLength = 5;
+    _textfieldName.inputType = XXTextFieldTypeAny;
+    _textfieldName.maxBytesLength = 10;
     
     
-    _textfieldPwd.inputType = XXTextFieldTypeForbidEmoj;
+//    _textfieldPwd.inputType = XXTextFieldTypeAny;
 //    _textfieldName.returnKeyType = UIReturnKeyNext;
 
 }

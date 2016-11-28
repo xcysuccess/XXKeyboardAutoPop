@@ -28,40 +28,10 @@
     //因为emoji一直在更新，这个不行
     assert(0);
 }
-
-//得到字节数函数,处理中英文的补起问题,找到最合适的,防止乱码
--(NSString*) subStrWithUtf8Len:(int)maxLen
-{
-    int strlen = 0;
-    NSUInteger len = [self length];
-    int i= 0;
-    for(i= 0; i< maxLen ; i++){
-        if(i< len){
-            unichar wchar = [self characterAtIndex:i];
-            if(wchar <= 127){
-                strlen++;
-            }
-            else{
-                strlen += 3;
-            }
-            if(strlen > maxLen){
-                break;
-            }
-        }
-        else{
-            break;
-        }
-    }
-    if(i <= 0){
-        return self;
-    }
-    NSString * str = [self substringWithRange:NSMakeRange(0,i)];
-    return str;
-}
 @end
 
 @interface XXTextField()<UITextFieldDelegate>
-@property(nonatomic,strong) NSString *lastContentText;
+@property(nonatomic,copy) NSString *lastContentText;
 @end
 
 @implementation XXTextField
@@ -123,8 +93,7 @@
         //---字节处理
         NSInteger bytesCount = strlen([textField.text UTF8String]);
         if (bytesCount > _maxBytesLength) {
-            NSString *content = [textField.text subStrWithUtf8Len:(int)_maxBytesLength];
-            textField.text = content;
+            textField.text = _lastContentText;
         }
     }
 }
@@ -208,6 +177,7 @@
             return NO;
         }
         else {
+            _lastContentText = inputString;
             return  YES;
         }
     }
